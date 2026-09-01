@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AIRCRAFT_DATA,
   calculateJettison,
@@ -82,6 +82,7 @@ function usePersistentState() {
 
 export default function Home() {
   const input = usePersistentState();
+  const manualRemainInput = useRef<HTMLInputElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
 
@@ -115,6 +116,11 @@ export default function Home() {
     && impliedZfwKg >= 0
     && impliedZfwKg <= AIRCRAFT_DATA.mzfwKg;
   const manualRemainAccepted = isFiniteNonNegative(parseTonnes(input.manualRemain));
+
+  function selectManualMode() {
+    input.setMode("MAN");
+    window.setTimeout(() => manualRemainInput.current?.focus(), 0);
+  }
 
   return (
     <main className="app-shell">
@@ -202,7 +208,7 @@ export default function Home() {
               type="button"
               className={input.mode === "MAN" ? "active manual" : "manual"}
               aria-pressed={input.mode === "MAN"}
-              onClick={() => input.setMode("MAN")}
+              onClick={selectManualMode}
             >
               MAN
             </button>
@@ -210,27 +216,25 @@ export default function Home() {
 
           <div className="remain-row">
             <span>TO REMAIN</span>
-            <output className="magenta-display">
-              {formatTonnes(result.selectedFuelToRemainKg)}
-            </output>
+            {input.mode === "MAN" ? (
+              <span className="manual-field remain-editor">
+                <input
+                  ref={manualRemainInput}
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={input.manualRemain}
+                  onChange={(event) => input.setManualRemain(event.target.value)}
+                  aria-invalid={!manualRemainAccepted}
+                  aria-label="Manual fuel to remain in tonnes"
+                />
+              </span>
+            ) : (
+              <output className="magenta-display">
+                {formatTonnes(result.selectedFuelToRemainKg)}
+              </output>
+            )}
             <span className="inline-unit">KGS X 1000</span>
           </div>
-
-          <label className={`manual-row ${input.mode === "MAN" ? "enabled" : ""}`}>
-            <span>MANUAL ENTRY</span>
-            <span className="manual-field">
-              <input
-                inputMode="decimal"
-                autoComplete="off"
-                value={input.manualRemain}
-                disabled={input.mode !== "MAN"}
-                onChange={(event) => input.setManualRemain(event.target.value)}
-                aria-invalid={input.mode === "MAN" && !manualRemainAccepted}
-                aria-label="Manual fuel to remain in tonnes"
-              />
-            </span>
-            <span className="inline-unit">KGS X 1000</span>
-          </label>
         </section>
 
         <div className="divider" />

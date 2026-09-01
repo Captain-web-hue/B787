@@ -116,12 +116,17 @@ export default function Home() {
   const grossWeightKg = parseTonnes(input.grossWeight);
   const totalFuelKg = parseTonnes(input.totalFuel);
   const impliedZfwKg = grossWeightKg - totalFuelKg;
-  const weightPairAccepted = isFiniteNonNegative(grossWeightKg)
-    && isFiniteNonNegative(totalFuelKg)
+  const grossWeightEntered = isFiniteNonNegative(grossWeightKg);
+  const totalFuelEntered = isFiniteNonNegative(totalFuelKg);
+  const weightPairConsistent = !grossWeightEntered
+    || !totalFuelEntered
+    || (impliedZfwKg >= 0 && impliedZfwKg <= AIRCRAFT_DATA.mzfwKg);
+  const grossWeightAccepted = grossWeightEntered
     && grossWeightKg <= AIRCRAFT_DATA.mtowKg
+    && weightPairConsistent;
+  const totalFuelAccepted = totalFuelEntered
     && totalFuelKg <= AIRCRAFT_DATA.totalFuelCapacityKg
-    && impliedZfwKg >= 0
-    && impliedZfwKg <= AIRCRAFT_DATA.mzfwKg;
+    && weightPairConsistent;
   const manualRemainAccepted = isFiniteNonNegative(parseTonnes(input.manualRemain));
 
   function selectManualMode() {
@@ -168,7 +173,7 @@ export default function Home() {
                 onFocus={() => input.setGrossWeight("")}
                 onChange={(event) => input.setGrossWeight(event.target.value)}
                 onBlur={() => input.setGrossWeight(normalizeTonnesInput(input.grossWeight))}
-                aria-invalid={!weightPairAccepted}
+                aria-invalid={!grossWeightAccepted}
                 aria-label="Current gross weight in tonnes"
               />
             </span>
@@ -192,7 +197,7 @@ export default function Home() {
                 onFocus={() => input.setTotalFuel("")}
                 onChange={(event) => input.setTotalFuel(event.target.value)}
                 onBlur={() => input.setTotalFuel(normalizeTonnesInput(input.totalFuel))}
-                aria-invalid={!weightPairAccepted}
+                aria-invalid={!totalFuelAccepted}
                 aria-label="Current total fuel in tonnes"
               />
             </span>

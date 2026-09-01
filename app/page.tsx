@@ -25,6 +25,10 @@ function formatTonnes(value: number, fallback = "--.-") {
   return (value / 1000).toFixed(1);
 }
 
+function isFiniteNonNegative(value: number) {
+  return Number.isFinite(value) && value >= 0;
+}
+
 function usePersistentState() {
   const [grossWeight, setGrossWeight] = useState(DEFAULT_INPUTS.grossWeight);
   const [totalFuel, setTotalFuel] = useState(DEFAULT_INPUTS.totalFuel);
@@ -98,6 +102,17 @@ export default function Home() {
     [input.grossWeight, input.totalFuel, input.manualRemain, input.mode],
   );
 
+  const grossWeightKg = parseTonnes(input.grossWeight);
+  const totalFuelKg = parseTonnes(input.totalFuel);
+  const impliedZfwKg = grossWeightKg - totalFuelKg;
+  const weightPairAccepted = isFiniteNonNegative(grossWeightKg)
+    && isFiniteNonNegative(totalFuelKg)
+    && grossWeightKg <= AIRCRAFT_DATA.mtowKg
+    && totalFuelKg <= AIRCRAFT_DATA.totalFuelCapacityKg
+    && impliedZfwKg >= 0
+    && impliedZfwKg <= AIRCRAFT_DATA.mzfwKg;
+  const manualRemainAccepted = isFiniteNonNegative(parseTonnes(input.manualRemain));
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -135,6 +150,7 @@ export default function Home() {
                 autoComplete="off"
                 value={input.grossWeight}
                 onChange={(event) => input.setGrossWeight(event.target.value)}
+                aria-invalid={!weightPairAccepted}
                 aria-label="Current gross weight in tonnes"
               />
             </span>
@@ -156,6 +172,7 @@ export default function Home() {
                 autoComplete="off"
                 value={input.totalFuel}
                 onChange={(event) => input.setTotalFuel(event.target.value)}
+                aria-invalid={!weightPairAccepted}
                 aria-label="Current total fuel in tonnes"
               />
             </span>
@@ -205,6 +222,7 @@ export default function Home() {
                 value={input.manualRemain}
                 disabled={input.mode !== "MAN"}
                 onChange={(event) => input.setManualRemain(event.target.value)}
+                aria-invalid={input.mode === "MAN" && !manualRemainAccepted}
                 aria-label="Manual fuel to remain in tonnes"
               />
             </span>

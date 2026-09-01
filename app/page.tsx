@@ -165,6 +165,7 @@ export default function Home() {
                 inputMode="decimal"
                 autoComplete="off"
                 value={input.grossWeight}
+                onFocus={() => input.setGrossWeight("")}
                 onChange={(event) => input.setGrossWeight(event.target.value)}
                 onBlur={() => input.setGrossWeight(normalizeTonnesInput(input.grossWeight))}
                 aria-invalid={!weightPairAccepted}
@@ -188,6 +189,7 @@ export default function Home() {
                 inputMode="decimal"
                 autoComplete="off"
                 value={input.totalFuel}
+                onFocus={() => input.setTotalFuel("")}
                 onChange={(event) => input.setTotalFuel(event.target.value)}
                 onBlur={() => input.setTotalFuel(normalizeTonnesInput(input.totalFuel))}
                 aria-invalid={!weightPairAccepted}
@@ -232,6 +234,7 @@ export default function Home() {
                   inputMode="decimal"
                   autoComplete="off"
                   value={input.manualRemain}
+                  onFocus={() => input.setManualRemain("")}
                   onChange={(event) => input.setManualRemain(event.target.value)}
                   onBlur={() => input.setManualRemain(normalizeTonnesInput(input.manualRemain))}
                   aria-invalid={!manualRemainAccepted}

@@ -1,19 +1,19 @@
 :root {
   /* OPT-inspired application palette. These are original project colours. */
-  --bg: #15161d;
-  --panel: #1f222a;
-  --panel-raised: #292c34;
-  --field: #424650;
-  --field-dark: #343841;
-  --output: #030405;
-  --line: #515661;
+  --bg: #1b1c22;
+  --panel: #21232a;
+  --panel-raised: #2b2c35;
+  --field: #40434d;
+  --field-dark: #393b42;
+  --output: #000;
+  --line: #393b42;
   --line-soft: rgba(168, 177, 187, .22);
-  --cyan: #009ed6;
-  --cyan-dim: #087da8;
-  --blue: #078dcc;
-  --white: #f2f4f6;
-  --muted: #a7adb5;
-  --green: #23c486;
+  --cyan: #34a8fb;
+  --cyan-dim: #017bc7;
+  --blue: #078fd7;
+  --white: #f4f5f5;
+  --muted: #969ea2;
+  --green: #16c975;
   --amber: #f2a726;
   --red: #ef4545;
 }
@@ -77,8 +77,8 @@ button { color: inherit; }
 .info-button { justify-self: end; border-color: #69707a; border-radius: 50%; width: 32px; height: 32px; font-family: Georgia, serif; font-size: 20px; }
 
 .calculator-panel {
-  border: 1px solid var(--cyan-dim);
-  border-radius: 4px;
+  border: 1px solid #2b2c35;
+  border-radius: 0 0 22px 22px;
   padding: clamp(16px, 3vw, 30px);
   background: var(--panel);
   box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
@@ -116,6 +116,9 @@ button { color: inherit; }
   font-size: clamp(33px, 7vw, 62px);
   letter-spacing: .06em;
 }
+.display-field input:focus, .manual-field input:focus { color: var(--white); }
+.display-field input[aria-invalid="true"]:not(:focus),
+.manual-field input[aria-invalid="true"]:not(:focus) { color: var(--red); }
 .display-field:focus-within, .manual-field:focus-within { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0, 158, 214, .22); }
 .derived-line { min-height: 20px; color: #b7c0c5; font-size: 13px; letter-spacing: .08em; }
 .unit-stack { display: grid; gap: 4px; color: var(--muted); text-align: center; font-size: clamp(14px, 2.1vw, 21px); letter-spacing: .06em; }

@@ -274,10 +274,16 @@ export default function Home() {
         </section>
       </section>
 
-      <p className="operational-note">
-        Planning aid. Verify against current approved FCOM/QRH, company procedures,
-        aircraft indications and actual conditions.
-      </p>
+      <aside className="operational-note" aria-label="Operational disclaimer">
+        <strong>QUICK CALCULATION AID</strong>
+        <span>
+          Intended only to help the flight crew quickly estimate jettison time while
+          accomplishing the B787 <b>FUEL AUTO JETTISON</b> non-normal checklist when
+          one or more tank quantity displays are blank. This tool does not replace the
+          current approved QRH/NNC, aircraft indications, operator procedures or crew
+          judgement. The approved checklist remains controlling.
+        </span>
+      </aside>
 
       {detailsOpen && (
         <div className="modal-backdrop" role="presentation" onClick={() => setDetailsOpen(false)}>

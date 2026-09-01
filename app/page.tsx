@@ -20,6 +20,13 @@ function parseTonnes(value: string) {
   return Number(normalized) * 1000;
 }
 
+function normalizeTonnesInput(value: string) {
+  const normalized = value.replace(",", ".").trim();
+  if (!normalized) return value;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed.toFixed(1) : value;
+}
+
 function formatTonnes(value: number, fallback = "--.-") {
   if (!Number.isFinite(value)) return fallback;
   return (value / 1000).toFixed(1);
@@ -159,6 +166,7 @@ export default function Home() {
                 autoComplete="off"
                 value={input.grossWeight}
                 onChange={(event) => input.setGrossWeight(event.target.value)}
+                onBlur={() => input.setGrossWeight(normalizeTonnesInput(input.grossWeight))}
                 aria-invalid={!weightPairAccepted}
                 aria-label="Current gross weight in tonnes"
               />
@@ -181,6 +189,7 @@ export default function Home() {
                 autoComplete="off"
                 value={input.totalFuel}
                 onChange={(event) => input.setTotalFuel(event.target.value)}
+                onBlur={() => input.setTotalFuel(normalizeTonnesInput(input.totalFuel))}
                 aria-invalid={!weightPairAccepted}
                 aria-label="Current total fuel in tonnes"
               />
@@ -224,6 +233,7 @@ export default function Home() {
                   autoComplete="off"
                   value={input.manualRemain}
                   onChange={(event) => input.setManualRemain(event.target.value)}
+                  onBlur={() => input.setManualRemain(normalizeTonnesInput(input.manualRemain))}
                   aria-invalid={!manualRemainAccepted}
                   aria-label="Manual fuel to remain in tonnes"
                 />

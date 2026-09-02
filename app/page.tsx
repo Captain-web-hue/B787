@@ -271,10 +271,6 @@ export default function Home() {
             <span>CENTER EMPTY</span>
             <strong>570 KG/MIN</strong>
           </div>
-          <div>
-            <span>MIN MAIN FUEL</span>
-            <strong>7,800 KG TOTAL</strong>
-          </div>
         </section>
       </section>
 

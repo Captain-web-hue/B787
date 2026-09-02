@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateJettison, formatDuration } from "../lib/jettison.ts";
+import { normalizeWeightInput, parseWeightKg } from "../lib/weight-input.ts";
+
+test("accepts OPT-style weight entry in tonnes or kilograms", () => {
+  assert.equal(parseWeightKg("200"), 200_000);
+  assert.equal(parseWeightKg("200.0"), 200_000);
+  assert.equal(parseWeightKg("200000"), 200_000);
+  assert.equal(parseWeightKg("97.7"), 97_700);
+  assert.equal(normalizeWeightInput("200"), "200000");
+  assert.equal(normalizeWeightInput("200.0"), "200000");
+  assert.equal(normalizeWeightInput("200000"), "200000");
+});
 
 test("calculates an MLW target with center fuel available", () => {
   const result = calculateJettison({ grossWeightKg: 211_100, totalFuelKg: 97_700, mode: "MLW" });

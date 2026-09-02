@@ -7,30 +7,13 @@ import {
   formatDuration,
   type JettisonMode,
 } from "@/lib/jettison";
+import { formatKg, normalizeWeightInput, parseWeightKg } from "@/lib/weight-input";
 
 const DEFAULT_INPUTS = {
-  grossWeight: "211.1",
-  totalFuel: "97.7",
-  manualRemain: "52.2",
+  grossWeight: "211100",
+  totalFuel: "97700",
+  manualRemain: "52200",
 };
-
-function parseTonnes(value: string) {
-  const normalized = value.replace(",", ".").trim();
-  if (!normalized) return Number.NaN;
-  return Number(normalized) * 1000;
-}
-
-function normalizeTonnesInput(value: string) {
-  const normalized = value.replace(",", ".").trim();
-  if (!normalized) return value;
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed.toFixed(1) : value;
-}
-
-function formatTonnes(value: number, fallback = "--.-") {
-  if (!Number.isFinite(value)) return fallback;
-  return (value / 1000).toFixed(1);
-}
 
 function isFiniteNonNegative(value: number) {
   return Number.isFinite(value) && value >= 0;
@@ -54,9 +37,9 @@ function usePersistentState() {
             manualRemain: string;
             mode: JettisonMode;
           }>;
-          if (parsed.grossWeight) setGrossWeight(parsed.grossWeight);
-          if (parsed.totalFuel) setTotalFuel(parsed.totalFuel);
-          if (parsed.manualRemain) setManualRemain(parsed.manualRemain);
+          if (parsed.grossWeight) setGrossWeight(normalizeWeightInput(parsed.grossWeight));
+          if (parsed.totalFuel) setTotalFuel(normalizeWeightInput(parsed.totalFuel));
+          if (parsed.manualRemain) setManualRemain(normalizeWeightInput(parsed.manualRemain));
           if (parsed.mode === "MLW" || parsed.mode === "MAN") setMode(parsed.mode);
         } catch {
           window.localStorage.removeItem("b787-jettison-inputs-v1");
@@ -105,16 +88,16 @@ export default function Home() {
   const result = useMemo(
     () =>
       calculateJettison({
-        grossWeightKg: parseTonnes(input.grossWeight),
-        totalFuelKg: parseTonnes(input.totalFuel),
+        grossWeightKg: parseWeightKg(input.grossWeight),
+        totalFuelKg: parseWeightKg(input.totalFuel),
         mode: input.mode,
-        manualFuelToRemainKg: parseTonnes(input.manualRemain),
+        manualFuelToRemainKg: parseWeightKg(input.manualRemain),
       }),
     [input.grossWeight, input.totalFuel, input.manualRemain, input.mode],
   );
 
-  const grossWeightKg = parseTonnes(input.grossWeight);
-  const totalFuelKg = parseTonnes(input.totalFuel);
+  const grossWeightKg = parseWeightKg(input.grossWeight);
+  const totalFuelKg = parseWeightKg(input.totalFuel);
   const impliedZfwKg = grossWeightKg - totalFuelKg;
   const grossWeightEntered = isFiniteNonNegative(grossWeightKg);
   const totalFuelEntered = isFiniteNonNegative(totalFuelKg);
@@ -127,7 +110,7 @@ export default function Home() {
   const totalFuelAccepted = totalFuelEntered
     && totalFuelKg <= AIRCRAFT_DATA.totalFuelCapacityKg
     && weightPairConsistent;
-  const manualRemainAccepted = isFiniteNonNegative(parseTonnes(input.manualRemain));
+  const manualRemainAccepted = isFiniteNonNegative(parseWeightKg(input.manualRemain));
 
   function selectManualMode() {
     input.setMode("MAN");
@@ -172,19 +155,18 @@ export default function Home() {
                 value={input.grossWeight}
                 onFocus={() => input.setGrossWeight("")}
                 onChange={(event) => input.setGrossWeight(event.target.value)}
-                onBlur={() => input.setGrossWeight(normalizeTonnesInput(input.grossWeight))}
+                onBlur={() => input.setGrossWeight(normalizeWeightInput(input.grossWeight))}
                 aria-invalid={!grossWeightAccepted}
                 aria-label="Current gross weight in tonnes"
               />
             </span>
             <span className="derived-line">
-              ZFW&nbsp;&nbsp;{formatTonnes(result.zeroFuelWeightKg)}
+              ZFW&nbsp;&nbsp;{formatKg(result.zeroFuelWeightKg)}
             </span>
           </label>
 
           <div className="unit-stack" aria-hidden="true">
-            <span>KGS</span>
-            <span>X 1000</span>
+            <span>KG</span>
           </div>
 
           <label className="input-card">
@@ -196,13 +178,13 @@ export default function Home() {
                 value={input.totalFuel}
                 onFocus={() => input.setTotalFuel("")}
                 onChange={(event) => input.setTotalFuel(event.target.value)}
-                onBlur={() => input.setTotalFuel(normalizeTonnesInput(input.totalFuel))}
+                onBlur={() => input.setTotalFuel(normalizeWeightInput(input.totalFuel))}
                 aria-invalid={!totalFuelAccepted}
                 aria-label="Current total fuel in tonnes"
               />
             </span>
             <span className="derived-line">
-              CTR&nbsp;&nbsp;{formatTonnes(result.assumedCenterFuelKg)}
+              CTR&nbsp;&nbsp;{formatKg(result.assumedCenterFuelKg)}
             </span>
           </label>
         </div>
@@ -241,17 +223,17 @@ export default function Home() {
                   value={input.manualRemain}
                   onFocus={() => input.setManualRemain("")}
                   onChange={(event) => input.setManualRemain(event.target.value)}
-                  onBlur={() => input.setManualRemain(normalizeTonnesInput(input.manualRemain))}
+                  onBlur={() => input.setManualRemain(normalizeWeightInput(input.manualRemain))}
                   aria-invalid={!manualRemainAccepted}
                   aria-label="Manual fuel to remain in tonnes"
                 />
               </span>
             ) : (
               <output className="magenta-display">
-                {formatTonnes(result.selectedFuelToRemainKg)}
+                {formatKg(result.selectedFuelToRemainKg)}
               </output>
             )}
-            <span className="inline-unit">KGS X 1000</span>
+            <span className="inline-unit">KG</span>
           </div>
         </section>
 
@@ -264,13 +246,13 @@ export default function Home() {
           </article>
           <article className="result-card">
             <span className="system-label">FUEL JETT</span>
-            <output>{formatTonnes(result.actualFuelToJettisonKg)}</output>
-            <small>KGS X 1000</small>
+            <output>{formatKg(result.actualFuelToJettisonKg)}</output>
+            <small>KG</small>
           </article>
           <article className="result-card">
             <span className="system-label">GW AFTER JETT</span>
-            <output>{formatTonnes(result.grossWeightAfterJettisonKg)}</output>
-            <small>KGS X 1000</small>
+            <output>{formatKg(result.grossWeightAfterJettisonKg)}</output>
+            <small>KG</small>
           </article>
         </section>
 
@@ -283,15 +265,15 @@ export default function Home() {
         <section className="rate-strip" aria-label="Calculation assumptions">
           <div>
             <span>CTR FUEL AVAILABLE</span>
-            <strong>1.36 T/MIN</strong>
+            <strong>1,360 KG/MIN</strong>
           </div>
           <div>
             <span>CENTER EMPTY</span>
-            <strong>0.57 T/MIN</strong>
+            <strong>570 KG/MIN</strong>
           </div>
           <div>
             <span>MIN MAIN FUEL</span>
-            <strong>7.8 T TOTAL</strong>
+            <strong>7,800 KG TOTAL</strong>
           </div>
         </section>
       </section>
@@ -324,12 +306,12 @@ export default function Home() {
               <button type="button" onClick={() => setDetailsOpen(false)} aria-label="Close">×</button>
             </div>
             <dl className="data-list">
-              <div><dt>MTOW</dt><dd>{formatTonnes(AIRCRAFT_DATA.mtowKg)} t</dd></div>
-              <div><dt>MLW</dt><dd>{formatTonnes(AIRCRAFT_DATA.mlwKg)} t</dd></div>
-              <div><dt>MZFW</dt><dd>{formatTonnes(AIRCRAFT_DATA.mzfwKg)} t</dd></div>
-              <div><dt>Main capacity</dt><dd>{formatTonnes(AIRCRAFT_DATA.mainTankCapacityKg)} t</dd></div>
-              <div><dt>Center capacity</dt><dd>{formatTonnes(AIRCRAFT_DATA.centerTankCapacityKg)} t</dd></div>
-              <div><dt>Minimum each main</dt><dd>{formatTonnes(AIRCRAFT_DATA.minFuelEachMainKg)} t</dd></div>
+              <div><dt>MTOW</dt><dd>{formatKg(AIRCRAFT_DATA.mtowKg)} kg</dd></div>
+              <div><dt>MLW</dt><dd>{formatKg(AIRCRAFT_DATA.mlwKg)} kg</dd></div>
+              <div><dt>MZFW</dt><dd>{formatKg(AIRCRAFT_DATA.mzfwKg)} kg</dd></div>
+              <div><dt>Main capacity</dt><dd>{formatKg(AIRCRAFT_DATA.mainTankCapacityKg)} kg</dd></div>
+              <div><dt>Center capacity</dt><dd>{formatKg(AIRCRAFT_DATA.centerTankCapacityKg)} kg</dd></div>
+              <div><dt>Minimum each main</dt><dd>{formatKg(AIRCRAFT_DATA.minFuelEachMainKg)} kg</dd></div>
             </dl>
             <p className="modal-copy">
               Tank distribution is estimated by filling the main tanks first, then the center tank.

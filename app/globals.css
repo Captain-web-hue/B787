@@ -262,14 +262,14 @@ button { color: inherit; }
   .calculator-panel { padding: 15px 12px; }
   .input-grid { grid-template-columns: minmax(0, 1fr) 50px minmax(0, 1fr); gap: 8px; }
   .display-field { min-height: 68px; }
-  .display-field input { font-size: clamp(30px, 11vw, 44px); letter-spacing: .01em; }
+  .display-field input { font-size: clamp(26px, 8vw, 44px); letter-spacing: .01em; }
   .derived-line { font-size: 10px; }
   .unit-stack { font-size: 10px; }
   .remain-row { grid-template-columns: 86px minmax(120px, 1fr) 72px; gap: 8px; font-size: 10px; }
   .inline-unit { font-size: 9px; }
   .result-grid { gap: 7px; }
   .result-card .system-label { min-height: 30px; display: grid; place-items: end center; font-size: 11px; }
-  .result-card output { min-height: 58px; font-size: clamp(23px, 8vw, 34px); }
+  .result-card output { min-height: 58px; font-size: clamp(18px, 5.8vw, 34px); }
   .status-line { grid-template-columns: 8px 1fr; }
   .status-line > span:last-child { grid-column: 1 / -1; padding-left: 18px; }
   .rate-strip { gap: 5px; }
